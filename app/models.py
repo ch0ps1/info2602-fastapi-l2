@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, or_
 from typing import Optional
 from pwdlib import PasswordHash
 

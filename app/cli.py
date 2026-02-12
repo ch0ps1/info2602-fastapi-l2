@@ -2,7 +2,7 @@ import typer
 from app.database import create_db_and_tables, get_session, drop_all
 from app.models import User
 from fastapi import Depends
-from sqlmodel import select
+from sqlmodel import select, or_
 from sqlalchemy.exc import IntegrityError
 
 cli = typer.Typer()
@@ -79,6 +79,22 @@ def delete_user(username: str):
         db.delete(user)
         db.commit()
         print(f'{username} deleted')
+
+@cli.command()
+def partial_match(search_term: str):
+    with get_session() as db:
+        
+        pattern = f"%{search_term}%"
+        
+        users = db.exec(select(User).where(or_(User.username.contains(search_term), User.email.contains(search_term)))).all()
+        if not users:
+            print(f'No users found matching "{search_term}"')
+        else:
+            for user in users:
+                print(user)
+
+
+
 
 
 if __name__ == "__main__":
